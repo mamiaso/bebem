@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sana Bir Sürprizim Var ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --color-env: linear-gradient(135deg, #ff4d6d, #ff8fa3); 
+            --color-env2: #ff758f; 
+            --color-paper: #fff5f7;
+            --color-text: #c9184a;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Brush Script MT', cursive;
+            overflow: hidden;
+        }
+
+        /* Love You Yazıları */
+        .love-text {
+            position: absolute;
+            color: rgba(255, 77, 109, 0.1);
+            font-size: 5rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .love-left { left: 5%; transform: rotate(-90deg); }
+        .love-right { right: 5%; transform: rotate(90deg); }
+
+        /* Uçan Arka Plan Kalpleri */
+        .floating-heart {
+            position: absolute;
+            color: #ff4d6d;
+            font-size: 20px;
+            user-select: none;
+            pointer-events: none;
+            animation: fly linear infinite;
+            z-index: 2;
+            opacity: 0;
+        }
+        @keyframes fly {
+            0% { transform: translateY(105vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: var(--color-env);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.4);
+            cursor: pointer;
+        }
+
+        .envelope-wrapper::before {
+            content: "";
+            position: absolute;
+            z-index: 5;
+            border-top: 100px solid transparent;
+            border-right: 150px solid var(--color-env2);
+            border-bottom: 100px solid var(--color-env2);
+            border-left: 150px solid #ff8fa3;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-top: 110px solid #ff4d6d;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 6;
+        }
+
+        .paper {
+            position: absolute;
+            bottom: 10px;
+            left: 25px;
+            width: 250px;
+            height: 180px;
+            background: var(--color-paper);
+            text-align: center;
+            padding: 15px;
+            box-sizing: border-box;
+            transition: all 0.8s ease-in-out;
+            z-index: 4;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .paper h2 {
+            color: var(--color-text);
+            font-size: 1.4rem;
+            margin: 10px 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .container.open .lid { transform: rotateX(180deg); z-index: 2; }
+        .container.open .paper { transform: translateY(-130px); }
+        .container.open .paper.clicked { transform: translateY(-220px) scale(1.1); z-index: 7; }
+        .container.open .paper.clicked h2 { opacity: 1; }
+
+        .heart-svg { width: 50px; fill: #ff4d6d; animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="love-text love-left">LOVE</div>
+    <div class="love-text love-right">YOU</div>
+
+    <div class="container" id="envelopeContainer">
+        <div class="envelope-wrapper" onclick="toggleEnvelope()">
+            <div class="lid"></div>
+            <div class="paper" id="mainPaper" onclick="showMessage(event)">
+                <svg class="heart-svg" viewBox="0 0 32 32">
+                    <path d="M16 28.5L14.1 26.6C7.2 20.4 2.5 16.2 2.5 11C2.5 6.8 5.8 3.5 10 3.5C12.4 3.5 14.7 4.6 16.2 6.3C17.7 4.6 20 3.5 22.3 3.5C26.5 3.5 29.8 6.8 29.8 11C29.8 16.2 25.1 20.4 18.2 26.6L16 28.5Z"/>
+                </svg>
+                <h2 id="msgText">Sevgililer günün kutlu olsun bebeğim ❤️ </h2>
+            </div>
+        </div>
+        <div class="instruction">Zarfa tıkla, Sonra mesaja tıkla ❤️</div>
+    </div>
+
+    <script>
+        let isOpen = false;
+
+        // --- Uçan Kalpler Mantığı ---
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createHeart, 400); // Sürekli kalpler
+
+        // --- Zarf ve Patlama Mantığı ---
+        function toggleEnvelope() {
+            if (!isOpen) {
+                document.getElementById('envelopeContainer').classList.add('open');
+                isOpen = true;
+                flowerBurst();
+            }
+        }
+
+        function showMessage(e) {
+            e.stopPropagation();
+            document.getElementById('mainPaper').classList.add('clicked');
+            confetti({
+                particleCount: 50,
+                spread: 100,
+                origin: { y: 0.3 },
+                colors: ['#ff4d6d', '#ffffff', '#ff8fa3']
+            });
+        }
+
+        function flowerBurst() {
+            confetti({
+                origin: { y: 0.6 },
+                zIndex: 999,
+                particleCount: 100,
+                spread: 120,
+                velocity: 35,
+                scalar: 2,
+                shapes: ['text'],
+                shapeOptions: {
+                    text: { value: ['🌸', '🌹', '🌷', '🌺', '❤️', '✨'] }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
