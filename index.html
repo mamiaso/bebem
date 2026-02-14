@@ -144,6 +144,8 @@
 </head>
 <body>
 
+    <audio id="arkaplanMuzik" src="muzik.mp3" preload="auto" loop></audio>
+
     <div class="love-text love-left">LOVE</div>
     <div class="love-text love-right">YOU</div>
 
@@ -179,6 +181,10 @@
         // --- Zarf ve Patlama Mantığı ---
         function toggleEnvelope() {
             if (!isOpen) {
+                // Müzik burada başlıyor
+                const music = document.getElementById('arkaplanMuzik');
+                music.play().catch(e => console.log("Müzik çalma hatası:", e));
+
                 document.getElementById('envelopeContainer').classList.add('open');
                 isOpen = true;
                 flowerBurst();
