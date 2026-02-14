@@ -24,7 +24,6 @@
             overflow: hidden;
         }
 
-        /* Arka plan yazıları */
         .love-text {
             position: absolute;
             color: rgba(255, 77, 109, 0.1);
@@ -36,7 +35,6 @@
         .love-left { left: 5%; transform: rotate(-90deg); }
         .love-right { right: 5%; transform: rotate(90deg); }
 
-        /* Uçan Arka Plan Kalpleri */
         .floating-heart {
             position: absolute;
             color: #ff4d6d;
@@ -118,7 +116,6 @@
             transition: opacity 0.5s ease;
         }
 
-        /* Animasyon sınıfları */
         .container.open .lid { transform: rotateX(180deg); z-index: 2; }
         .container.open .paper { transform: translateY(-130px); }
         .container.open .paper.clicked { transform: translateY(-220px) scale(1.1); z-index: 7; }
@@ -145,16 +142,15 @@
 </head>
 <body>
 
-    <audio id="arkaplanMuzik" loop>
+    <audio id="muzikCalar" loop>
         <source src="muzik.mp3" type="audio/mpeg">
-        Tarayıcınız ses etiketini desteklemiyor.
     </audio>
 
     <div class="love-text love-left">LOVE</div>
     <div class="love-text love-right">YOU</div>
 
     <div class="container" id="envelopeContainer">
-        <div class="envelope-wrapper" onclick="toggleEnvelope()">
+        <div class="envelope-wrapper" onclick="zarfiAc()">
             <div class="lid"></div>
             <div class="paper" id="mainPaper" onclick="showMessage(event)">
                 <svg class="heart-svg" viewBox="0 0 32 32">
@@ -168,8 +164,8 @@
 
     <script>
         let isOpen = false;
+        const music = document.getElementById('muzikCalar');
 
-        // --- Uçan Kalpler ---
         function createHeart() {
             const heart = document.createElement('div');
             heart.className = 'floating-heart';
@@ -182,28 +178,21 @@
         }
         setInterval(createHeart, 400);
 
-        // --- Zarfı Açma ve Müzik Başlatma ---
-        function toggleEnvelope() {
-            const music = document.getElementById('arkaplanMuzik');
-            
+        // ANA FONKSİYON
+        function zarfiAc() {
             if (!isOpen) {
-                // Müziği oynatmayı dene
-                music.play().catch(error => {
-                    console.error("Müzik başlatılamadı:", error);
-                });
-
+                // Müziği oynatma komutu
+                music.play().catch(e => console.log("Müzik hatası: ", e));
+                
                 document.getElementById('envelopeContainer').classList.add('open');
                 isOpen = true;
                 flowerBurst();
             }
         }
 
-        // --- Mesaja Tıklama (Kağıt yükselir) ---
         function showMessage(e) {
-            e.stopPropagation(); // Zarfın kapanmasını engeller
+            e.stopPropagation();
             document.getElementById('mainPaper').classList.add('clicked');
-            
-            // İkinci bir kutlama patlaması
             confetti({
                 particleCount: 50,
                 spread: 100,
@@ -212,7 +201,6 @@
             });
         }
 
-        // --- Konfeti Patlaması ---
         function flowerBurst() {
             confetti({
                 origin: { y: 0.6 },
